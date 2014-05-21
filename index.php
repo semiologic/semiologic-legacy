@@ -21,7 +21,9 @@ if ( have_posts() )
 	{
 		the_post();
 
-		echo '<div class="entry" id="entry-' . get_the_ID() . '">' . "\n";
+		$class = get_post_class();
+
+		echo '<div id="entry-' . get_the_ID() . '" class="entry' . ( $class ? ( ' ' . implode(' ', $class) ) : '' ) . '">' . "\n";
 
 		do_action('the_entry');
 

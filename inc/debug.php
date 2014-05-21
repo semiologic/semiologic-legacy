@@ -6,6 +6,8 @@
 if ( !defined('SAVEQUERIES') && isset($_GET['debug']) && $_GET['debug'] == 'sql' )
 	define('SAVEQUERIES', true);
 
+if ( !defined('sem_sql_debug') )
+	define('sem_sql_debug', false);
 
 /**
  * add_stop()
@@ -48,16 +50,19 @@ function add_stop($in = null, $where = null) {
  **/
 
 function dump_stops($in = null) {
-	if ( $_POST || !current_user_can('manage_options') )
+	if ( ( $_POST || !current_user_can('manage_options') ) && !sem_sql_debug )
 		return $in;
 	
+	if ( function_exists('is_super_admin') && !is_super_admin() )
+		return $in;
+
 	global $sem_stops;
 	global $wp_object_cache;
 	
 	$stops = '';
 	foreach ( $sem_stops as $where => $stop )
 		$stops .= "$where: $stop\n";
-	dump($stops);
+	dump("\n" . trim($stops) . "\n");
 	
 	# only show queries to admin users
 	if ( defined('SAVEQUERIES') && $_GET['debug'] == 'sql' ) {
@@ -97,6 +102,23 @@ function dump_stops($in = null) {
 		}
 	}
 
+	if ( $_GET['debug'] == 'js' ) {
+		$js = <<<EOS
+<div id='jsdump'></div>
+<script type="text/javascript">
+jQuery.log('rendering - done');
+jQuery(document).ready(function() {
+	jQuery.log('scripts - done');
+	jQuery.dumpLogs();
+})
+jQuery.initLogs();
+jQuery.log('scripts - start');
+</script>
+EOS;
+
+		dump($js);
+	}
+
 	return $in;
 } # dump_stops()
 
@@ -117,6 +139,92 @@ add_action('admin_footer', create_function('$in', '
 	return add_stop($in, "Display");
 	'), 10000000);
 
-add_action('wp_footer', 'dump_stops', 10000000);
-add_action('admin_footer', 'dump_stops', 10000000);
+/**
+ * init_dump()
+ *
+ * @return void
+ **/
+
+function init_dump() {
+	global $hook_suffix;
+	if ( !is_admin() || empty($hook_suffix) ) {
+		add_action('wp_footer', 'dump_stops', 10000000);
+		add_action('admin_footer', 'dump_stops', 10000000);
+	} else {
+		add_action('wp_footer', 'dump_stops', 10000000);
+		add_action("admin_footer-$hook_suffix", 'dump_stops', 10000000);
+	}
+} # init_dump()
+
+add_action('wp_print_scripts', 'init_dump');
+
+
+/**
+ * dump_phpinfo()
+ *
+ * @return void
+ **/
+
+function dump_phpinfo() {
+	if ( function_exists('is_super_admin') && !is_super_admin() )
+		return;
+
+	if ( (isset($_GET['debug']) && $_GET['debug'] == 'phpinfo') && current_user_can('manage_options') ) {
+		phpinfo();
+		die;
+	}
+} # dump_phpinfo()
+
+add_action('init', 'dump_phpinfo');
+
+
+/**
+ * dump_js()
+ *
+ * @return void
+ **/
+
+function dump_js() {
+	if ( function_exists('is_super_admin') && !is_super_admin() )
+		return;
+
+	$folder = sem_url . '/js';
+	wp_enqueue_script('jquery-logger', $folder . '/jquery.logger.js', array('jquery'),  '20090903');
+} # dump_js()
+
+if ( isset($_GET['debug']) && $_GET['debug'] == 'js' )
+	add_action('wp_print_scripts', 'dump_js');
+
+
+/**
+ * dump_http()
+ *
+ * @param array $args
+ * @param string $url
+ * @return array $args
+ **/
+
+function dump_http($args, $url) {
+	dump(preg_replace("|/[0-9a-f]{32}/?$|", '', $url));
+	return $args;
+} # dump_http()
+
+
+/**
+ * dump_trace()
+ *
+ * @return void
+ **/
+
+function dump_trace() {
+	$backtrace = debug_backtrace();
+	foreach ( $backtrace as $trace )
+		dump(
+			'File/Line: ' . $trace['file'] . ', ' . $trace['line'],
+			'Function / Class: ' . $trace['function'] . ', ' . $trace['class']
+			);
+} # dump_trace()
+
+if ( $_GET['debug'] == 'http' )
+	add_filter('http_request_args', 'dump_http', 0, 2);
 ?>

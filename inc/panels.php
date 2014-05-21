@@ -156,9 +156,12 @@ class sem_panels {
 		
 		if ( is_admin() ) {
 			global $wp_filter;
-			$filter_backup = $wp_filter['sidebars_widgets'];
-			unset($wp_filter['sidebars_widgets']);
-			$sidebars_widgets = wp_get_sidebars_widgets(false);
+            $filter_backup = array();
+            if ( isset($wp_filter['sidebars_widgets'])) {
+                $filter_backup = $wp_filter['sidebars_widgets'];
+                unset($wp_filter['sidebars_widgets']);
+            }
+			$sidebars_widgets = wp_get_sidebars_widgets();
 			$wp_filter['sidebars_widgets'] = $filter_backup;
 			$sidebars_widgets = sem_panels::convert($sidebars_widgets);
 			$sidebars_widgets = sem_panels::install($sidebars_widgets);
@@ -172,6 +175,7 @@ class sem_panels {
 		} else {
 			if ( empty($GLOBALS['_wp_sidebars_widgets']) )
 				$GLOBALS['_wp_sidebars_widgets'] = get_option('sidebars_widgets', array('array_version' => 3));
+
 			$GLOBALS['_wp_sidebars_widgets'] = sem_panels::convert($GLOBALS['_wp_sidebars_widgets']);
 			$GLOBALS['_wp_sidebars_widgets'] = sem_panels::install($GLOBALS['_wp_sidebars_widgets']);
 			$GLOBALS['_wp_sidebars_widgets'] = sem_panels::upgrade($GLOBALS['_wp_sidebars_widgets']);
@@ -231,9 +235,14 @@ class sem_panels {
 		$registered_sidebars = array_keys($wp_registered_sidebars);
 		$registered_sidebars = array_diff($registered_sidebars, array('wp_inactive_widgets'));
 		foreach ( $registered_sidebars as $sidebar )
-			$sidebars_widgets[$sidebar] = (array) $sidebars_widgets[$sidebar];
-		$sidebars_widgets['wp_inactive_widgets'] = (array) $sidebars_widgets['wp_inactive_widgets'];
-		
+            if (isset($sidebars_widgets[$sidebar])) {
+                $sidebars_widgets[$sidebar] = (array) $sidebars_widgets[$sidebar];
+            }
+        if (isset($sidebars_widgets['wp_inactive_widgets']))
+		    $sidebars_widgets['wp_inactive_widgets'] = (array) $sidebars_widgets['wp_inactive_widgets'];
+        else
+            $sidebars_widgets['wp_inactive_widgets'] = array();
+
 		# convert left/right sidebars into sidebar-1/-2
 		foreach ( array(
 			'sidebar-1' => array(
@@ -259,12 +268,17 @@ class sem_panels {
 		}
 		
 		foreach ( $default_widgets as $panel => $widgets ) {
-			if ( empty($sidebars_widgets[$panel]) )
+            if ( !isset($sidebars_widgets[$panel]) )
+                $sidebars_widgets[$panel] = array();
+			elseif ( empty($sidebars_widgets[$panel]) )
 				$sidebars_widgets[$panel] = (array) $sidebars_widgets[$panel];
 			else
 				continue;
 			
 			foreach ( $widgets as $widget ) {
+                if ( !isset($wp_widget_factory->widgets[$widget]) )
+                    continue;
+
 				if ( !is_a($wp_widget_factory->widgets[$widget], 'WP_Widget') )
 					continue;
 				
@@ -531,7 +545,15 @@ class sem_panels {
 	 **/
 
 	function switch_themes() {
-		update_option('init_sem_panels', '1');
+		if ( !get_option('init_sem_panels') ) {
+			$sidebars_widgets = wp_get_sidebars_widgets();
+			foreach ( array('before_the_entries', 'the_entry', 'after_the_entries') as $sidebar ) {
+				if ( empty($sidebars_widgets[$sidebar]) ) {
+					update_option('init_sem_panels', '1');
+					break;
+				}
+			}
+		}
 	} # switch_themes()
 	
 	
@@ -557,6 +579,17 @@ class sem_panels {
 		
 		return $sidebars_widgets;
 	} # convert()
+
+	/**
+	 * reload_widgets()
+	 *
+	 * @return void
+	 **/
+
+	function reload_widgets() {
+     // WP 3.3 function to handle preserving theme switches
+     _wp_sidebars_changed();
+ }  # reload_widgets()
 } # sem_panels
 
 
@@ -564,6 +597,8 @@ sem_panels::register();
 
 if ( !defined('DOING_CRON') )
 	add_action('init', array('sem_panels', 'init_widgets'), 2000);
+
+add_action( 'after_switch_theme', array('sem_panels', 'reload_widgets'), 2000);
 
 if ( !empty($_GET['preview']) && !empty($_GET['stylesheet']) )
 	sem_panels::switch_themes();

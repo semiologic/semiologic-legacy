@@ -81,10 +81,10 @@ class sem_header {
 					. "</div>\n";
 				return;
 			} else {
-				$entropy = intval(get_option('sem_entropy')) + 1;
-				update_option('sem_entropy', $entropy);
+				$entropy = intval(get_site_option('sem_entropy')) + 1;
+				update_site_option('sem_entropy', $entropy);
 				
-				$name = WP_CONTENT_DIR . '/header/header-' . $entropy . '.' . $ext;
+				$name = WP_CONTENT_DIR . header::get_basedir() . '/header-' . $entropy . '.' . $ext;
 				
 				@move_uploaded_file($_FILES['header_file']['tmp_name'], $name);
 				
@@ -130,7 +130,7 @@ class sem_header {
 	 * @return void
 	 **/
 	
-	function edit_options() {
+	static function edit_options() {
 		echo '<div class="wrap">';
 		
 		echo '<form enctype="multipart/form-data" method="post" action="">';
@@ -141,8 +141,6 @@ class sem_header {
 		
 		$header = header::get();
 		$active_skin = $sem_options['active_skin'];
-		
-		screen_icon();
 		
 		echo '<h2>' . __('Manage Header', 'sem-theme') . '</h2>' . "\n";
 		
@@ -187,10 +185,11 @@ class sem_header {
 			}
 		}
 		
-		wp_mkdir_p(WP_CONTENT_DIR . '/header');
+		$site_basedir = header::get_basedir();
+		wp_mkdir_p(WP_CONTENT_DIR . $site_basedir);
 		
 		if ( !$header || is_writable(WP_CONTENT_DIR . $header) || strpos($header, "/skins/$active_skin/") !== false ) {
-			if ( is_writable(WP_CONTENT_DIR . '/header') ) {
+			if ( is_writable(WP_CONTENT_DIR . $site_basedir) ) {
 				echo '<h3>'
 					. '<label for="header_file">'
 						. ( defined('GLOB_BRACE')
@@ -214,7 +213,7 @@ class sem_header {
 			}
 			
 			echo '<p>'
-				. sprintf(__('Maximum file size is %s based on your server\'s configuration.', 'sem-theme'), wp_convert_bytes_to_hr(apply_filters('import_upload_size_limit', wp_max_upload_size())))
+				. sprintf(__('Maximum file size is %s based on your server\'s configuration.', 'sem-reloaded'), size_format(apply_filters('import_upload_size_limit', wp_max_upload_size())))
 				. '</p>' . "\n";
 			
 			echo '<div class="submit">'
@@ -235,7 +234,7 @@ class sem_header {
 	 * @return void
 	 **/
 	
-	function edit_entry($post)
+	static function edit_entry($post)
 	{
 		$post_ID = $post->ID;
 		
@@ -247,7 +246,7 @@ class sem_header {
 			$scan_type = false;
 		}
 		
-		$header = glob(WP_CONTENT_DIR . "/header/$post_ID/$header_scan", $scan_type);
+		$header = glob(WP_CONTENT_DIR . header::get_basedir() . "/$post_ID/$header_scan", $scan_type);
 		
 		if ( $header ) {
 			$header = current($header);
@@ -295,7 +294,7 @@ class sem_header {
 			}
 		}
 		
-		wp_mkdir_p(WP_CONTENT_DIR . '/header');
+		wp_mkdir_p(WP_CONTENT_DIR . header::get_basedir());
 		
 		if ( !$header || is_writable(WP_CONTENT_DIR . $header) ) {
 			if ( is_writable(WP_CONTENT_DIR . '/header') ) {
@@ -324,7 +323,7 @@ class sem_header {
 			}
 			
 			echo '<p>'
-				. sprintf(__('Maximum file size is %s based on your server\'s configuration.', 'sem-theme'), wp_convert_bytes_to_hr(apply_filters('import_upload_size_limit', wp_max_upload_size())))
+				. sprintf(__('Maximum file size is %s based on your server\'s configuration.', 'sem-theme'), size_format(apply_filters('import_upload_size_limit', wp_max_upload_size())))
 				. '</p>' . "\n";
 		}
 	} # edit_entry()
@@ -351,7 +350,7 @@ class sem_header {
 			$scan_type = false;
 		}
 		
-		$header = glob(WP_CONTENT_DIR . "/header/$post_id/$header_scan", $scan_type);
+		$header = glob(WP_CONTENT_DIR . header::get_basedir() . "/$post_id/$header_scan", $scan_type);
 		
 		if ( $header ) {
 			$header = current($header);
@@ -366,16 +365,16 @@ class sem_header {
 			
 			if ( !in_array($ext, defined('GLOB_BRACE') ? array('jpg', 'jpeg', 'png', 'gif', 'swf') : array('jpg')) ) {
 				return;
-			} elseif ( !wp_mkdir_p(WP_CONTENT_DIR . '/header/' . $post_id) ) {
+			} elseif ( !wp_mkdir_p(WP_CONTENT_DIR . header::get_basedir() . '/' .  $post_id) ) {
 				return;
 			} elseif ( $header && !@unlink(WP_CONTENT_DIR . $header) ) {
 				return;
 			}
 			
-			$entropy = intval(get_option('sem_entropy')) + 1;
-			update_option('sem_entropy', $entropy);
+			$entropy = intval(get_site_option('sem_entropy')) + 1;
+			update_site_option('sem_entropy', $entropy);
 			
-			$name = WP_CONTENT_DIR . '/header/' . $post_id . '/header-' . $entropy . '.' . $ext;
+			$name = WP_CONTENT_DIR . header::get_basedir() . '/' . $post_id . '/header-' . $entropy . '.' . $ext;
 			
 			wp_mkdir_p(WP_CONTENT_DIR . '/header/' . $post_id);
 			@move_uploaded_file($_FILES['header_file']['tmp_name'], $name);
@@ -389,7 +388,9 @@ class sem_header {
 			if ( !@unlink(WP_CONTENT_DIR . $header) ) {
 				return;
 			}
-			
+			if ( !@rmdir(WP_CONTENT_DIR . header::get_basedir() . '/' .  $post_id) ) {
+				return;
+			}
 			delete_post_meta($post_id, '_sem_header');
 		}
 	} # save_entry()

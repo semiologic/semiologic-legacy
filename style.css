@@ -1,19 +1,20 @@
 /*
-Theme Name: Semiologic (DEPRECATED)
+Theme Name: Semiologic Legacy (Deprecated)
 Theme URI: http://www.semiologic.com/software/sem-theme/
 Description: The Deprecated Semiologic theme.
-Version: 6.0.5
-Author: Denis de Bernardy
-Author URI: http://www.getsemiologic.com
+Version: 6.1
+Author: Denis de Bernardy & Mike Koepke
+Author URI: http://www.semiologic.com
 Text Domain: sem-theme
-Domain Path: /lang
-*/
+License: Dual licensed under the MIT and GPLv2 licenses
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: two-columns, three-columns, fluid-layout, fixed-layout, custom-header
 
 /*
 Terms of use
 ------------
 
-This software is copyright Mesoconcepts (http://www.mesoconcepts.com), and is distributed under the terms of the GPL license, v.2.
+This software is copyright Denis de Bernardy & Mike Koepke, and is distributed under the terms of the MIT and GPLv2 licenses.
 
 http://www.opensource.org/licenses/gpl-2.0.php
 **/
@@ -539,6 +540,16 @@ float: left;
 	margin: .2em auto;
 }
 
+/* Misc WP Required Classes */
+
+.bypostauthor {
+}
+
+.sticky {
+}
+
+.gallery-caption {
+}
 
 /* ad */
 
@@ -585,6 +596,12 @@ div.announcement
 	overflow: hidden;
 }
 */
+
+/* prevent widget items like Recent Posts from overflowing columns */
+#sidebar li,
+#ext_sidebar li {
+	word-wrap: break-word;
+}
 
 /* calendar */
 
@@ -804,6 +821,13 @@ div.media
 .gallery_nav .next_image
 {
 	float: right;
+}
+
+.wp_thumbnail {
+	display: block;
+	float: left;
+	border: outset 1px;
+	margin: 4px 10px 0px 4px;
 }
 
 /* comments / avatars */

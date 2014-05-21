@@ -125,8 +125,6 @@ EOS;
 		$layouts = sem_layout::get_layouts();
 		$widths = sem_layout::get_widths();
 		
-		screen_icon();
-		
 		echo '<h2>' . __('Manage Layout', 'sem-theme') . '</h2>' . "\n";
 		
 		echo '<h3>' . __('Current Layout and Width', 'sem-theme') . '</h3>' . "\n";

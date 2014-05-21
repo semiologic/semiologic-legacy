@@ -1,17 +1,19 @@
-=== Semiologic theme (Deprecated) ===
+=== Semiologic Legacy theme  ===
 Contributors: Denis-de-Bernardy
 Donate link: http://www.semiologic.com/partners/
 Tags: semiologic
 Requires at least: 2.8
-Tested up to: 2.9.2
+Tested up to: 3.9.1
 Stable tag: trunk
 
-The Semiologic theme (Deprecated) for WordPress.
+The Semiologic Legacy theme for WordPress.
 
 
 == Description ==
 
-The Semiologic theme (Deprecated) for WordPress.
+The Semiologic Legacy theme for WordPress.  This theme is Deprecated and only being maintained for WordPress compatibility.
+
+Please see the [Semiologic Reloaded](http://www.semiologic.com/software/sem-reloaded/) for the actively supported theme.
 
 
 = Help Me! =
@@ -27,7 +29,19 @@ The [Semiologic forum](http://forum.semiologic.com) is the best place to report 
 
 == Change Log ==
 
-= 6.0.4
+= 6.1 =
+
+- Added post thumbnails support
+- Fix: Sidebar widget lists with long post/page titles don't overflow widget boundaries
+- Roll in bug fixes from sem-reloaded theme
+- Added missing required WP css class rules
+- Use size_format in place of deprecated wp_convert_bytes_to_hr
+- Fixed incorrect url being generated for hierarchies with children of children in Pages, Nav-Menus and Silo widgets.  url was being generated as parent/grandparent/child
+- Alter css encoding for header image shadow for W3C compliance
+- Fix unknown index warnings
+- WP 3.9 compat
+
+= 6.0.4 =
 
 - Fix a potential infinite loop
 - Avoid using broken WP functions

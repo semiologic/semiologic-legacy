@@ -21,9 +21,8 @@ if ( $title = trim(wp_title('&#8211;', false)) ) {
 }
 ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php bloginfo('charset'); ?>" />
-<link rel="alternate" type="application/rss+xml" title="<?php _e('RSS feed'); ?>" href="<?php bloginfo('rss2_url'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-<?php do_action('wp_head'); ?>
+<?php wp_head(); ?>
 </head>
 <body class="<?php echo implode(' ', get_body_class(array('skin', 'custom'))); ?>">
 <div style="width: 600px; margin-left: auto; margin-right: auto;">
@@ -56,7 +55,7 @@ elseif ( is_404() )
 do_action('after_the_entries');
 
 # show footer
-do_action('wp_footer');
+	wp_footer();
 ?>
 </div>
 </body>

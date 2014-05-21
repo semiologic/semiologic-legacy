@@ -152,7 +152,7 @@ function upgrade_sem_5_5() {
 			$items = array();
 
 			foreach ( $nav_items as $label => $ref ) {
-				if ( untrailingslashit($ref) == untrailingslashit(get_option('home')) ) {
+				if ( untrailingslashit($ref) == untrailingslashit(home_url()) ) {
 					$items[] = array(
 						'type' => 'home',
 						'label' => $label,

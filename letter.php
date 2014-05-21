@@ -30,9 +30,8 @@ if ( $title = trim(wp_title('&#8211;', false)) ) {
 }
 ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php bloginfo('charset'); ?>" />
-<link rel="alternate" type="application/rss+xml" title="<?php _e('RSS feed'); ?>" href="<?php bloginfo('rss2_url'); ?>" />
 <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>" />
-<?php do_action('wp_head'); ?>
+<?php wp_head(); ?>
 </head>
 <body class="<?php echo implode(' ', get_body_class(array('skin', 'custom'))); ?>"><div id="ext_wrapper">
 <div id="wrapper">
@@ -61,7 +60,7 @@ the_post();
 </div><!-- #ext_wrapper -->
 <?php
 do_action('display_canvas_spacer');
-do_action('wp_footer');
+wp_footer();
 ?>
 </body>
 </html>

@@ -17,8 +17,13 @@ if ( !defined('sem_widget_cache_debug') )
 if ( !defined('sem_header_cache_debug') )
 	define('sem_header_cache_debug', false);
 
-if ( function_exists('memory_get_usage') && ( (int) @ini_get('memory_limit') < 48 ) )
-	@ini_set('memory_limit', '48M');
+if ( !defined('sem_css_debug') )
+	define('sem_css_debug', false);
+
+define('sem_last_mod', sem_css_debug ? time() : '20140513');
+
+if ( function_exists('memory_get_usage') && ( (int) @ini_get('memory_limit') < 64 ) )
+	@ini_set('memory_limit', '64M');
 
 define('sem_path', dirname(dirname(__FILE__)));
 define('sem_url', get_stylesheet_directory_uri());
@@ -31,6 +36,11 @@ if ( !class_exists('sem_fixes') ) {
 	wp_timezone_override_offset();
 }
 
+if ( function_exists('add_theme_support') ) {
+	add_theme_support('post-thumbnails');
+	add_theme_support( 'automatic-feed-links' );
+}
+
 
 #
 # extra functions
@@ -40,6 +50,7 @@ if ( !function_exists('true') ) :
 /**
  * true()
  *
+ * @param bool $bool
  * @return bool true
  **/
 
@@ -53,6 +64,7 @@ if ( !function_exists('false') ) :
 /**
  * false()
  *
+ * @param bool $bool
  * @return bool false
  **/
 

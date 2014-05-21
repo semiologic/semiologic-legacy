@@ -134,7 +134,7 @@ class sem_widgets {
 	 * @return false
 	 **/
 
-	function search_widget($instance, $args) {
+	static function search_widget($instance, $args) {
 		extract($args, EXTR_SKIP);
 		extract($instance, EXTR_SKIP);
 		
@@ -151,7 +151,7 @@ class sem_widgets {
 			echo $before_title . $title . $after_title;
 		
 		echo '<form method="get"'
-				. ' action="' . esc_url(user_trailingslashit(get_option('home'))) . '"'
+				. ' action="' . esc_url(user_trailingslashit(home_url())) . '"'
 				. ' class="searchform" name="searchform"'
 				. '>'
 			. '<input type="text" class="s" name="s"'
@@ -215,7 +215,7 @@ class entry_header extends WP_Widget {
 		extract($instance, EXTR_SKIP);
 		
 		$date = false;
-		if ( $show_post_date && !is_sticky() && ( is_single() || !is_singular() ) )
+		if ( $show_post_date && !is_sticky() && ( is_single() || !is_singular() && !is_day() ) )
 			$date = the_date('', '', '', false);
 		
 		$title = the_title('', '', false);
@@ -434,12 +434,26 @@ class entry_content extends WP_Widget {
 					. '</div>' . "\n";
 			}
 		}
-		
+
+		$thumbnail = '';
+		if ( !is_single() && function_exists('get_the_post_thumbnail') ) {
+			add_filter('image_downsize', array($this, 'thumbnail_downsize'), 10, 3);
+			$thumbnail = get_the_post_thumbnail();
+			remove_filter('image_downsize', array($this, 'thumbnail_downsize'), 10, 3);
+		}
+
+		if ( $thumbnail ) {
+			$thumbnail = '<div class="wp_thumbnail">'
+				. $thumbnail
+				. '</div>' . "\n";
+		}
+
 		if ( $actions || $content ) {
 			if ( is_letter() ) {
 				echo $before_widget
 					. '<div class="letter">' . "\n"
 					. $actions
+					. $thumbnail
 					. $content
 					. '<div class="spacer"></div>' . "\n"
 					. '</div>' . "\n"
@@ -447,6 +461,7 @@ class entry_content extends WP_Widget {
 			} else {
 				echo $before_widget
 					. $actions
+					. $thumbnail
 					. $content
 					. '<div class="spacer"></div>' . "\n"
 					. $after_widget;
@@ -454,7 +469,22 @@ class entry_content extends WP_Widget {
 		}
 	} # widget()
 	
-	
+	/**
+	 * thumbnail_downsize()
+	 *
+	 * @param mixed $in
+	 * @param int $id
+	 * @param string $size
+	 * @return false on failure, array on success
+	 **/
+
+	function thumbnail_downsize($in, $id, $size) {
+		if ( $in || $size != 'post-thumbnail' )
+			return $in;
+		return image_downsize($id, 'thumbnail');
+	} # thumbnail_downsize()
+
+
 	/**
 	 * more_link()
 	 *
@@ -1726,7 +1756,7 @@ class header extends WP_Widget {
 		if ( !$flash && !( is_front_page() && !is_paged() ) ) {
 			echo ' style="cursor: pointer;"'
 				. ' onclick="top.location.href = \''
-					. esc_url(user_trailingslashit(get_option('home')))
+					. esc_url(user_trailingslashit(home_url()))
 					. '\'"';
 		}
 
@@ -1741,7 +1771,7 @@ class header extends WP_Widget {
 
 			$site_name = '<div id="sitename" class="sitename"><h1>'
 				. ( !( is_front_page() && !is_paged() )
-					? ( '<a href="' . esc_url(user_trailingslashit(get_option('home'))) . '">' . get_option('blogname') . '</a>' )
+					? ( '<a href="' . esc_url(user_trailingslashit(home_url())) . '">' . get_option('blogname') . '</a>' )
 					: get_option('blogname')
 					)
 				. '</h1></div>' . "\n";
@@ -1805,9 +1835,9 @@ class header extends WP_Widget {
 	 * @return string $html
 	 **/
 
-	function display_image($header = null) {
+	static function display_image($header = null) {
 		if ( !$header )
-			$header = header::get_header();
+			$header = header::get();
 
 		if ( !$header )
 			return;
@@ -1831,9 +1861,9 @@ class header extends WP_Widget {
 	 * @return string $html
 	 **/
 
-	function display_flash($header = null) {
+	static function display_flash($header = null) {
 		if ( !$header )
-			$header = header::get_header();
+			$header = header::get();
 
 		if ( !$header )
 			return;
@@ -1859,11 +1889,11 @@ EOS;
 	/**
 	 * letter()
 	 *
-	 * @param int $post_ID
-	 * @return void
+     *
+     * @return void
 	 **/
 
-	function letter() {
+	static function letter() {
 		$header = header::get();
 		
 		if ( !$header || $header != get_post_meta(get_the_ID(), '_sem_header', true) )
@@ -1872,14 +1902,37 @@ EOS;
 		echo header::display($header);
 	} # letter()
 	
-	
+
+	/**
+	 * get_basedir()
+	 *
+	 * @return string $header_basedir
+	 **/
+	static function get_basedir() {
+		static $header_basedir;
+
+		if ( isset($header_basedir) )
+			return $header_basedir;
+
+		$header_basedir = '/header';
+		if ( defined('SUBDOMAIN_INSTALL') && SUBDOMAIN_INSTALL )
+			$header_basedir .= '/' . $_SERVER['HTTP_HOST'];
+		if ( function_exists('is_multisite') && is_multisite() ) {
+			$home_path = parse_url(home_url());
+			$home_path = isset($home_path['path']) ? rtrim($home_path['path'], '/') : '';
+			$header_basedir .= $home_path;
+		}
+
+		return $header_basedir;
+	}
+
 	/**
 	 * get()
 	 *
-	 * @return void
+	 * @return string $header
 	 **/
 
-	function get() {
+	static function get() {
 		static $header;
 		
 		if ( !is_admin() && isset($header) )
@@ -1913,7 +1966,7 @@ EOS;
 			$header = false;
 		}
 		
-		if ( $header !== false ) {
+		if ( !empty($header) ) {
 			$header_size = @getimagesize(WP_CONTENT_DIR . $header);
 			if ( $header_size ) {
 				wp_cache_set('sem_header', $header_size, 'sem_header');
@@ -1921,6 +1974,8 @@ EOS;
 			}
 		}
 		
+		$header_basedir = header::get_basedir();
+
 		if ( defined('GLOB_BRACE') ) {
 			$header_scan = "header{,-*}.{jpg,jpeg,png,gif,swf}";
 			$skin_scan = "header.{jpg,jpeg,png,gif,swf}";
@@ -1933,7 +1988,7 @@ EOS;
 		
 		if ( is_singular() ) {
 			# entry-specific header
-			$header = glob(WP_CONTENT_DIR . "/header/$post_ID/$header_scan", $scan_type);
+			$header = glob(WP_CONTENT_DIR . "$header_basedir/$post_ID/$header_scan", $scan_type);
 			if ( $header ) {
 				$header = current($header);
 				$header = str_replace(WP_CONTENT_DIR, '', $header);
@@ -1950,7 +2005,7 @@ EOS;
 		switch ( true ) {
 		default:
 			# uploaded header
-			$header = glob(WP_CONTENT_DIR . "/header/$header_scan", $scan_type);
+			$header = glob(WP_CONTENT_DIR . "$header_basedir/$header_scan", $scan_type);
 			if ( $header )
 				break;
 			
@@ -1972,7 +2027,7 @@ EOS;
 			$header = current($header);
 			$header = str_replace(WP_CONTENT_DIR, '', $header);
 			$header_size = @getimagesize(WP_CONTENT_DIR . $header);
-			if ( $header_size ) {
+			if ( false !== $header_size ) {
 				wp_cache_set('sem_header', $header_size, 'sem_header');
 				set_transient('sem_header', $header);
 				return $header;
@@ -2019,6 +2074,9 @@ EOS;
 		
 		list($width, $height) = wp_cache_get('sem_header', 'sem_header');
 		
+		if ( !$height )
+			return;
+
 		$header = esc_url(content_url() . $header);
 		
 		echo <<<EOS
@@ -2027,11 +2085,15 @@ EOS;
 .skin #header_img {
 	background: url(${header}) no-repeat top center;
 	height: ${height}px;
+	width: 100%;
 	border: 0px;
 	overflow: hidden;
 	position: relative;
 	padding: 0px;
 	margin: 0px auto;
+}
+.skin #header_img img {
+    width: 100%;
 }
 </style>
 
@@ -2217,7 +2279,7 @@ class sem_nav_menu extends WP_Widget {
 		extract($item, EXTR_SKIP);
 		if ( !isset($label) || (string) $label === '' )
 			$label = __('Home', 'sem-theme');
-		$url = esc_url(user_trailingslashit(get_option('home')));
+		$url = esc_url(user_trailingslashit(home_url()));
 		
 		$classes = array('nav_home');
 		$link = $label;
@@ -2251,7 +2313,7 @@ class sem_nav_menu extends WP_Widget {
 		if ( !$url || $url == 'http://' )
 			return;
 		
-		if ( rtrim($url, '/') == rtrim(get_option('home'), '/') )
+		if ( rtrim($url, '/') == rtrim(home_url(), '/') )
 			return sem_nav_menu::display_home($item);
 		
 		if ( !sem_nav_menu::is_local_url($url) ) {
@@ -2288,7 +2350,7 @@ class sem_nav_menu extends WP_Widget {
 	function display_page($item) {
 		extract($item, EXTR_SKIP);
 		$ref = (int) $ref;
-		$page = get_page($ref);
+		$page = get_post($ref);
 		
 		if ( !$page || $page->post_parent != 0 && get_post_meta($page->ID, '_widgets_exclude', true) )
 			return;
@@ -2366,7 +2428,7 @@ class sem_nav_menu extends WP_Widget {
 		if ( is_page() ) {
 			global $wp_the_query;
 			$page_id = (int) $wp_the_query->get_queried_object_id();
-			$page = get_page($page_id);
+			$page = get_post($page_id);
 		} else {
 			$page_id = 0;
 			$page = null;
@@ -2374,9 +2436,9 @@ class sem_nav_menu extends WP_Widget {
 		
 		if ( get_option('show_on_front') == 'page' ) {
 			$front_page_id = (int) get_option('page_on_front');
-			$front_page = get_page($front_page_id);
+			$front_page = get_post($front_page_id);
 			$blog_page_id = (int) get_option('page_for_posts');
-			$blog_page = $blog_page_id ? get_page($blog_page_id) : null;
+			$blog_page = $blog_page_id ? get_post($blog_page_id) : null;
 		} else {
 			$front_page_id = 0;
 			$front_page = null;
@@ -2389,7 +2451,7 @@ class sem_nav_menu extends WP_Widget {
 			$ancestors = array();
 			while ( $page && $page->post_parent != 0 ) {
 				$ancestors[] = (int) $page->post_parent;
-				$page = get_page($page->post_parent);
+				$page = get_post($page->post_parent);
 			}
 			$ancestors = array_reverse($ancestors);
 			wp_cache_set($page_id, $ancestors, 'page_ancestors');
@@ -2400,7 +2462,7 @@ class sem_nav_menu extends WP_Widget {
 			$front_page_ancestors = array();
 			while ( $front_page && $front_page->post_parent != 0 ) {
 				$front_page_ancestors[] = (int) $front_page->post_parent;
-				$front_page = get_page($front_page->post_parent);
+				$front_page = get_post($front_page->post_parent);
 			}
 			$front_page_ancestors = array_reverse($front_page_ancestors);
 			wp_cache_set($front_page_id, $front_page_ancestors, 'page_ancestors');
@@ -2411,7 +2473,7 @@ class sem_nav_menu extends WP_Widget {
 			$blog_page_ancestors = array();
 			while ( $blog_page && $blog_page->post_parent != 0 ) {
 				$blog_page_ancestors[] = (int) $blog_page->post_parent;
-				$blog_page = get_page($blog_page->post_parent);
+				$blog_page = get_post($blog_page->post_parent);
 			}
 			$blog_page_ancestors = array_reverse($blog_page_ancestors);
 			wp_cache_set($blog_page_id, $blog_page_ancestors, 'page_ancestors');
@@ -2464,7 +2526,7 @@ class sem_nav_menu extends WP_Widget {
 			SELECT	posts.ID
 			FROM	$wpdb->posts as posts
 			WHERE	posts.post_type = 'page'
-			AND		post_status <> 'trash'
+			AND		post_status IN ( 'publish', 'private' )
 			AND		posts.post_parent IN ( " . implode(',', $root_ids) . " )
 			");
 		
@@ -2510,6 +2572,7 @@ class sem_nav_menu extends WP_Widget {
 		foreach ( array_keys($pages) as $k ) {
 			$ancestors = wp_cache_get($pages[$k]->ID, 'page_ancestors');
 			array_shift($ancestors);
+            $ancestors = array_reverse($ancestors);
 			$pages[$k]->ancestors = $ancestors;
 		}
 
@@ -2534,7 +2597,7 @@ class sem_nav_menu extends WP_Widget {
 		static $site_domain;
 		
 		if ( !isset($site_domain) ) {
-			$site_domain = get_option('home');
+			$site_domain = home_url();
 			$site_domain = parse_url($site_domain);
 			$site_domain = $site_domain['host'];
 			$site_domain = preg_replace("/^www\./i", '', $site_domain);
@@ -2578,6 +2641,8 @@ class sem_nav_menu extends WP_Widget {
 		
 		if ( $site_domain == $link_domain ) {
 			return true;
+		} elseif ( function_exists('is_multisite') && is_multisite() ) {
+			return false;
 		} else {
 			$site_elts = explode('.', $site_domain);
 			$link_elts = explode('.', $link_domain);
@@ -2749,7 +2814,7 @@ class sem_nav_menu extends WP_Widget {
 			switch ( $type ) {
 			case 'home':
 				$ref = 'home';
-				$url = user_trailingslashit(get_option('home'));
+				$url = user_trailingslashit(home_url());
 				$handle = 'home';
 				break;
 			case 'url':
@@ -2827,7 +2892,7 @@ EOS;
 	 * @return void
 	 **/
 
-	function admin_footer() {
+	static function admin_footer() {
 		$pages = wp_cache_get('nav_menu_roots', 'nav_menu_roots');
 		
 		if ( $pages === false ) {
@@ -2886,7 +2951,7 @@ EOS;
 			switch ( $type ) {
 			case 'home':
 				$ref = 'home';
-				$url = user_trailingslashit(get_option('home'));
+				$url = user_trailingslashit(home_url());
 				$handle = 'home';
 				break;
 			case 'url':
@@ -3137,7 +3202,7 @@ EOS;
 					SELECT	ID
 					FROM	$wpdb->posts
 					WHERE	post_type = 'page'
-					AND		post_status <> 'trash'
+					AND		post_status IN ( 'publish', 'private' )
 					");
 				wp_cache_set('page_ids', $page_ids, 'widget_queries');
 			}
@@ -3235,7 +3300,7 @@ class navbar extends sem_nav_menu {
 				$go = '<input type="submit" id="go" class="go button submit" value="' . esc_attr($go) . '" />';
 			
 			echo '<form method="get"'
-					. ' action="' . esc_url(user_trailingslashit(get_option('home'))) . '"'
+					. ' action="' . esc_url(user_trailingslashit(home_url())) . '"'
 					. ' id="searchform" name="searchform"'
 					. '>'
 				. '&nbsp;'				# force line-height
@@ -3331,6 +3396,42 @@ class navbar extends sem_nav_menu {
 			'show_search_form' => true,
 			), parent::defaults());
 	} # defaults()
+
+
+	/**
+	 * default_items()
+	 *
+	 * @return array $items
+	 **/
+
+	function default_items() {
+		$items = array(array('type' => 'home'));
+
+		$roots = wp_cache_get(0, 'page_children');
+
+		if ( !$roots )
+			return $items;
+
+		$front_page_id = get_option('show_on_front') == 'page'
+			? (int) get_option('page_on_front')
+			: 0;
+
+		foreach ( $roots as $root_id ) {
+			if ( $root_id == $front_page_id )
+				continue;
+			if ( get_post_meta($root_id, '_widgets_exclude', true) )
+				continue;
+			if ( !wp_cache_get($root_id, 'page_children') ) # only sections
+				continue;
+
+			$items[] = array(
+				'type' => 'page',
+				'ref' => $root_id,
+				);
+		}
+
+		return $items;
+	} # default_items()
 } # navbar
 
 
@@ -3453,6 +3554,10 @@ class footer extends sem_nav_menu {
 			echo '<p>'
 				. '<label for="' . $this->get_field_id($field) . '">'
 				. '<code>' . htmlspecialchars($defaults[$field], ENT_QUOTES, get_option('blog_charset')) . '</code>'
+				. ( isset($defaults[$field . '_label'])
+					? '<br />' . "\n" . '<code>' . $defaults[$field . '_label'] . '</code>'
+					: ''
+					)
 				. '</label>'
 				. '<br />' . "\n"
 				. '<textarea class="widefat" cols="20" rows="4"'
@@ -3498,20 +3603,39 @@ class footer extends sem_nav_menu {
 			), parent::defaults());
 	} # defaults()
 	
-	
 	/**
-	 * default_items
+	 * default_items()
 	 *
-	 * @return array $default_items
+	 * @return array $items
 	 **/
 
 	function default_items() {
-		return array(
-			array(
-				'label' => __('Home', 'sem-theme'),
-				'type' => 'home',
-				),
-			);
+		$items = array(array('type' => 'home'));
+
+		$roots = wp_cache_get(0, 'page_children');
+
+		if ( !$roots )
+			return $items;
+
+		$front_page_id = get_option('show_on_front') == 'page'
+			? (int) get_option('page_on_front')
+			: 0;
+
+		foreach ( $roots as $root_id ) {
+			if ( $root_id == $front_page_id )
+				continue;
+			if ( get_post_meta($root_id, '_widgets_exclude', true) )
+				continue;
+			if ( wp_cache_get($root_id, 'page_children') ) # only non-sections
+				continue;
+
+			$items[] = array(
+				'type' => 'page',
+				'ref' => $root_id,
+				);
+		}
+
+		return $items;
 	} # default_items()
 } # footer
 
@@ -3537,7 +3661,9 @@ foreach ( array(
 		'generate_rewrite_rules',
 		
 		'flush_cache',
-		'after_db_upgrade',
+	    'after_db_upgrade',
+        'wp_upgrade',
+
 		) as $hook )
 	add_action($hook, array('sem_nav_menu', 'flush_cache'));
 

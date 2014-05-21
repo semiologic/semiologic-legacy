@@ -28,7 +28,7 @@ if ( $post->post_password !== ''
 # Displaytrackback uri
 #
 
-if ( $sem_options['show_trackback_uri'] )
+if ( isset( $sem_options['show_trackback_uri'] ) && $sem_options['show_trackback_uri'] )
 {
 	display_trackback_uri();
 }
@@ -108,7 +108,7 @@ if ( $comments )
 
 		echo '<div class="comment_actions">' . "\n";
 
-		if ( $sem_options['show_comment_permalink'] )
+		if ( isset( $sem_options['show_comment_permalink'] ) && $sem_options['show_comment_permalink'] )
 		{
 			echo '<span class="comment_action link_comment">'
 				. '<a href="#comment-'. get_comment_ID() . '">'

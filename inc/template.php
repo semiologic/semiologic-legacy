@@ -86,9 +86,16 @@ class sem_template {
 				$classes[] = $template;
 			}
 		}
-		
+
+		if ( is_singular() ) {
+            global $post;
+            if ( isset( $post ) ) {
+                $classes[] = $post->post_type . '-' . $post->post_name;
+            }
+        }
+
 		if ( header::get() )
-			$classes['header_bg'];
+			$classes[] = 'header_bg';
 		
 		return $classes;
 	} # body_class()
@@ -154,7 +161,7 @@ class sem_template {
 	 * @return string $layout
 	 **/
 
-	function strip_sidebars($layout) {
+	static function strip_sidebars($layout) {
 		return str_replace(array('s', 'e'), '', $layout);
 	} # strip_sidebars()
 	
@@ -166,7 +173,10 @@ class sem_template {
 	 * @return string $width
 	 **/
 
-	function force_letter($width) {
+	static function force_letter($layout) {
+		global $content_width;
+		$content_width = 620;
+
 		return 'letter';
 	} # force_letter()
 	
@@ -298,7 +308,7 @@ class sem_template {
 	 * @return string $credits
 	 **/
 
-	function get_theme_credits() {
+	static function get_theme_credits() {
 		if ( get_option('sem_api_key') ) {
 			return '<a href="http://www.getsemiologic.com">'
 				. __('Semiologic Pro', 'sem-theme')
@@ -323,10 +333,10 @@ class sem_template {
 	 * @return array $credits
 	 **/
 
-	function get_skin_credits() {
+	static function get_skin_credits() {
 		global $sem_options;
 		
-		if ( is_admin() || !is_array($sem_options['skin_data']) ) {
+		if ( is_admin() || !isset($sem_options['skin_data']) || !is_array($sem_options['skin_data']) ) {
 			$details = sem_template::get_skin_data($sem_options['active_skin']);
 			$sem_options['skin_data'] = $details;
 			if ( !defined('sem_install_test') )
@@ -356,10 +366,11 @@ class sem_template {
 	/**
 	 * get_skin_data()
 	 *
+     * @param $skin_id
 	 * @return array $data
 	 **/
 
-	function get_skin_data($skin_id) {
+	static function get_skin_data($skin_id) {
 		$fields = array( 'name', 'uri', 'version', 'author_name', 'author_uri', 'description', 'tags' );
 		
 		$allowed_tags = array(

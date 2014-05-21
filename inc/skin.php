@@ -185,7 +185,7 @@ EOS;
 	 * @return void
 	 **/
 	
-	function edit_options() {
+	static function edit_options() {
 		echo '<div class="wrap">' . "\n";
 		echo '<form method="post" action="" id="option_picker">' . "\n";
 		
@@ -195,8 +195,6 @@ EOS;
 		$skins = sem_skin::get_skins();
 		$fonts = sem_skin::get_fonts();
 		$font_sizes = sem_skin::get_font_sizes();
-		
-		screen_icon();
 		
 		echo '<h2>' . __('Manage Skin &amp; Font', 'sem-theme') . '</h2>' . "\n";
 		
@@ -429,7 +427,7 @@ EOS;
 	 * @return array $skins
 	 **/
 
-	function get_skins() {
+	static function get_skins() {
 		$skins = array();
 		$handle = @opendir(sem_path . '/skins');
 
@@ -461,7 +459,7 @@ EOS;
 	 * @return int
 	 **/
 
-	function sort($a, $b) {
+	static function sort($a, $b) {
 		return strnatcasecmp($a['name'], $b['name']);
 	} # sort()
 	
@@ -472,7 +470,7 @@ EOS;
 	 * @return array $fonts
 	 **/
 
-	function get_fonts() {
+	static function get_fonts() {
 		return array(
 			'' =>  __('The skin\'s default', 'sem-theme'),
 			'arial' => __('Arial, Helvetica, Sans-Serif', 'sem-theme'),

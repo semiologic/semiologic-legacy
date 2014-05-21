@@ -26,7 +26,7 @@ do_action('display_sidebar2');
 </div><!-- #body -->
 
 <?php
-do_action('the_footer');
+wp_footer();
 ?>
 
 </div><!-- #wrapper -->
