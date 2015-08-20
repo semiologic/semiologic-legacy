@@ -40,6 +40,7 @@ do_action('display_ext_sidebar');
 <?php
 do_action('after_the_wrapper');
 do_action('wp_footer');
+do_action('body_close');
 ?>
 </body>
 </html>

@@ -184,7 +184,7 @@ class entry_header extends WP_Widget {
 	 * @return void
 	 **/
 
-	function entry_header() {
+	public function __construct() {
 		$widget_name = __('Entry: Header', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'entry_header',
@@ -194,7 +194,7 @@ class entry_header extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('entry_header', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('entry_header', $widget_name, $widget_ops, $control_ops);
 	} # entry_header()
 	
 	
@@ -319,7 +319,7 @@ class entry_content extends WP_Widget {
 	 * @return void
 	 **/
 
-	function entry_content() {
+	public function __construct() {
 		$widget_name = __('Entry: Content', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'entry_content',
@@ -329,7 +329,7 @@ class entry_content extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('entry_content', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('entry_content', $widget_name, $widget_ops, $control_ops);
 		
 		if ( class_exists('fancy_excerpt') )
 			add_filter('the_content_more_link', array(&$this, 'more_link'), 0);
@@ -604,7 +604,7 @@ class entry_categories extends WP_Widget {
 	 * @return void
 	 **/
 	
-	function entry_categories() {
+	public function __construct() {
 		$widget_name = __('Entry: Categories', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'entry_categories',
@@ -614,7 +614,7 @@ class entry_categories extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('entry_categories', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('entry_categories', $widget_name, $widget_ops, $control_ops);
 	} # entry_categories()
 	
 	
@@ -833,7 +833,7 @@ class entry_tags extends WP_Widget {
 	 * @return void
 	 **/
 
-	function entry_tags() {
+	public function __construct() {
 		$widget_name = __('Entry: Tags', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'entry_tags',
@@ -843,7 +843,7 @@ class entry_tags extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('entry_tags', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('entry_tags', $widget_name, $widget_ops, $control_ops);
 	} # entry_tags()
 	
 	
@@ -994,7 +994,7 @@ class entry_comments extends WP_Widget {
 	 * @return void
 	 **/
 
-	function entry_comments() {
+	public function __construct() {
 		$widget_name = __('Entry: Comments', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'entry_comments',
@@ -1004,7 +1004,7 @@ class entry_comments extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('entry_comments', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('entry_comments', $widget_name, $widget_ops, $control_ops);
 	} # entry_comments()
 	
 	
@@ -1147,7 +1147,7 @@ class blog_header extends WP_Widget {
 	 * @return void
 	 **/
 
-	function blog_header() {
+	public function __construct() {
 		$widget_name = __('Blog: Header', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'blog_header archives_header',
@@ -1157,7 +1157,7 @@ class blog_header extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('blog_header', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('blog_header', $widget_name, $widget_ops, $control_ops);
 	} # blog_header()
 	
 	
@@ -1324,7 +1324,7 @@ class blog_footer extends WP_Widget {
 	 * @return void
 	 **/
 
-	function blog_footer() {
+	public function __construct() {
 		$widget_name = __('Blog: Footer', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'blog_footer next_prev_posts',
@@ -1334,7 +1334,7 @@ class blog_footer extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('blog_footer', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('blog_footer', $widget_name, $widget_ops, $control_ops);
 	} # blog_footer()
 	
 	
@@ -1620,14 +1620,14 @@ class header_boxes extends WP_Widget {
 	 * @return void
 	 **/
 
-	function header_boxes() {
+	public function __construct() {
 		$widget_name = __('Header: Boxes Bar', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'header_boxes',
 			'description' => __('Lets you decide where the Footer Boxes Bar panel goes. Must be placed in the header area.', 'sem-theme'),
 			);
 		
-		$this->WP_Widget('header_boxes', $widget_name, $widget_ops);
+		parent::__construct('header_boxes', $widget_name, $widget_ops);
 	} # header_boxes()
 	
 	
@@ -1661,14 +1661,14 @@ class footer_boxes extends WP_Widget {
 	 * @return void
 	 **/
 
-	function footer_boxes() {
+	public function __construct() {
 		$widget_name = __('Footer: Boxes Bar', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'footer_boxes',
 			'description' => __('Lets you decide where the Footer Boxes Bar panel goes. Must be placed in the footer area.', 'sem-theme'),
 			);
 		
-		$this->WP_Widget('footer_boxes', $widget_name, $widget_ops);
+		parent::__construct('footer_boxes', $widget_name, $widget_ops);
 	} # footer_boxes()
 	
 	
@@ -1702,7 +1702,7 @@ class header extends WP_Widget {
 	 * @return void
 	 **/
 
-	function header() {
+	public function __construct() {
 		$widget_name = __('Header: Site Header', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'header',
@@ -1712,7 +1712,7 @@ class header extends WP_Widget {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('header', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('header', $widget_name, $widget_ops, $control_ops);
 	} # header()
 	
 	
@@ -2171,6 +2171,11 @@ class sem_nav_menu extends WP_Widget {
 	 * @param array $instance widget options
 	 * @return void
 	 **/
+
+	public function __construct( $id_base, $name, $widget_options = array(), $control_options = array() ) {
+		parent::__construct( $id_base, $name, $widget_options, $control_options );
+    }
+
 
 	function widget($args, $instance) {
 		extract($args, EXTR_SKIP);
@@ -3230,7 +3235,7 @@ class navbar extends sem_nav_menu {
 	 * @return void
 	 **/
 
-	function navbar() {
+	public function __construct() {
 		$widget_name = __('Header: Nav Menu', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'navbar',
@@ -3240,7 +3245,7 @@ class navbar extends sem_nav_menu {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('navbar', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('navbar', $widget_name, $widget_ops, $control_ops);
 	} # navbar()
 	
 	
@@ -3448,7 +3453,7 @@ class footer extends sem_nav_menu {
 	 * @return void
 	 **/
 
-	function footer() {
+	public function __construct() {
 		$widget_name = __('Footer: Nav Menu', 'sem-theme');
 		$widget_ops = array(
 			'classname' => 'footer',
@@ -3458,7 +3463,7 @@ class footer extends sem_nav_menu {
 			'width' => 330,
 			);
 		
-		$this->WP_Widget('footer', $widget_name, $widget_ops, $control_ops);
+		parent::__construct('footer', $widget_name, $widget_ops, $control_ops);
 	} # footer()
 	
 	

@@ -33,6 +33,9 @@ do_action('the_header');
 ?>
 
 <div id="body" class="body">
+<?php
+	do_action('body_open');
+?>
 <div id="ext_main">
 <div id="main" class="main">
 <div class="pad">
