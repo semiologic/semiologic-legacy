@@ -12,7 +12,7 @@ class sem_widgets {
 	 * @return void
 	 **/
 
-	function register() {
+	static function register() {
 		register_widget('entry_header');
 		register_widget('entry_content');
 		register_widget('entry_categories');
@@ -34,7 +34,7 @@ class sem_widgets {
 	 * @return void
 	 **/
 
-	function admin_scripts() {
+	static function admin_scripts() {
 		if ( !class_exists('nav_menu') ) {
 			$folder = sem_url . '/js';
 			wp_enqueue_script('nav-menus', $folder . '/admin.js', array('jquery-ui-sortable'),  '20090903', true);
@@ -50,7 +50,7 @@ class sem_widgets {
 	 * @return void
 	 **/
 
-	function admin_styles() {
+	static function admin_styles() {
 		$folder = sem_url . '/css';
 		wp_enqueue_style('nav-menus', $folder . '/admin.css', null, '20090903');
 	} # admin_styles()
@@ -63,7 +63,7 @@ class sem_widgets {
 	 * @return array $args
 	 **/
 
-	function tag_cloud_args($args) {
+	static function tag_cloud_args($args) {
 		$args = wp_parse_args($args, array('smallest' => '.8', 'largest' => '1.6', 'unit' => 'em'));
 		return $args;
 	} # tag_cloud_args()
@@ -78,7 +78,7 @@ class sem_widgets {
 	 * @return array $instance
 	 **/
 
-	function widget_display_callback($instance, $widget, $args) {
+	static function widget_display_callback($instance, $widget, $args) {
 		if ( $instance === false )
 			return $instance;
 		
@@ -2046,7 +2046,7 @@ EOS;
 	 * @return void
 	 **/
 
-	function wire(&$wp) {
+	static function wire(&$wp) {
 		$header = header::get();
 		
 		if ( !$header )
@@ -2069,7 +2069,7 @@ EOS;
 	 * @return void
 	 **/
 
-	function css() {
+	static function css() {
 		$header = header::get();
 		
 		list($width, $height) = wp_cache_get('sem_header', 'sem_header');
@@ -2214,7 +2214,7 @@ class sem_nav_menu extends WP_Widget {
 		sem_nav_menu::cache_pages();
 		
 		if ( !$items ) {
-			$items = call_user_func(array(get_class($this), 'default_items'));
+			$items = call_user_func(array('sem_nav_menu', 'default_items'));
 		}
 		
 		$root_pages = wp_cache_get(0, 'page_children');
@@ -3032,7 +3032,7 @@ EOS;
 	 * @return array $items
 	 **/
 
-	function default_items() {
+	static function default_items() {
 		$items = array(array('type' => 'home'));
 		
 		$roots = wp_cache_get(0, 'page_children');
@@ -3169,7 +3169,7 @@ EOS;
 	 * @return mixed $in
 	 **/
 	
-	function flush_cache($in = null) {
+	static function flush_cache($in = null) {
 		static $done = false;
 		if ( $done )
 			return $in;
@@ -3409,7 +3409,7 @@ class navbar extends sem_nav_menu {
 	 * @return array $items
 	 **/
 
-	function default_items() {
+	static function default_items() {
 		$items = array(array('type' => 'home'));
 
 		$roots = wp_cache_get(0, 'page_children');
@@ -3614,7 +3614,7 @@ class footer extends sem_nav_menu {
 	 * @return array $items
 	 **/
 
-	function default_items() {
+	static function default_items() {
 		$items = array(array('type' => 'home'));
 
 		$roots = wp_cache_get(0, 'page_children');

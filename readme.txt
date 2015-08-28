@@ -3,15 +3,15 @@ Contributors: Denis-de-Bernardy
 Donate link: http://www.semiologic.com/partners/
 Tags: semiologic
 Requires at least: 2.8
-Tested up to: 3.9.1
+Tested up to: 4.3
 Stable tag: trunk
 
-The Semiologic Legacy theme for WordPress.
+*Deprecated* The Semiologic Legacy theme for WordPress.
 
 
 == Description ==
 
-The Semiologic Legacy theme for WordPress.  This theme is Deprecated and only being maintained for WordPress compatibility.
+The Semiologic Legacy theme for WordPress.  This theme is no longer under active developemnt and only being maintained for absolutely necessary WordPress and PHP compatibility.
 
 Please see the [Semiologic Reloaded](http://www.semiologic.com/software/sem-reloaded/) for the actively supported theme.
 
@@ -24,10 +24,17 @@ The [Semiologic forum](http://forum.semiologic.com) is the best place to report 
 == Installation ==
 
 1. Upload the plugin folder to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
+2. Activate the plugin through the 'Plugins' menu in WordPress
 
 
 == Change Log ==
+
+= 6.2 =
+
+- Fix various warnings regarding static/non-static php calls
+- Updated to use PHP5 constructors as WP deprecated PHP4 constructor type in 4.3.
+- WP 4.3 compat
+- Tested against PHP 5.6
 
 = 6.1 =
 

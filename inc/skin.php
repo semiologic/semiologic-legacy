@@ -12,7 +12,7 @@ class sem_skin {
 	 * @return void
 	 **/
 	
-	function admin_head() {
+	static function admin_head() {
 		echo <<<EOS
 
 <style type="text/css">
@@ -150,7 +150,7 @@ EOS;
 	 * @return void
 	 **/
 	
-	function save_options() {
+	static function save_options() {
 		if ( !$_POST || !current_user_can('switch_themes') )
 			return;
 		
@@ -495,7 +495,7 @@ EOS;
 	 * @return array $font_sizes
 	 **/
 
-	function get_font_sizes() {
+	static function get_font_sizes() {
 		return array(
 			'small' => __('Small Font', 'sem-theme'),
 			'medium' => __('Medium Font', 'sem-theme'),

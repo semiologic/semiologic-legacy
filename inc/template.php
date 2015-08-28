@@ -12,7 +12,7 @@ class sem_template {
 	 * @return void
 	 **/
 
-	function admin_menu() {
+	static function admin_menu() {
 		add_theme_page(
 			__('Manage Header', 'sem-theme'),
 			__('Header', 'sem-theme'),
@@ -43,7 +43,7 @@ class sem_template {
 	 * @return void
 	 **/
 
-	function meta_boxes() {
+	static function meta_boxes() {
 		if ( current_user_can('switch_themes') ) {
 			add_meta_box('sem_header', __('Post-Specific Header', 'sem-theme'), array('sem_header', 'edit_entry'), 'post');
 			add_meta_box('sem_header', __('Page-Specific Header', 'sem-theme'), array('sem_header', 'edit_entry'), 'page');
@@ -58,7 +58,7 @@ class sem_template {
 	 * @return array $classes
 	 **/
 
-	function body_class($classes) {
+	static function body_class($classes) {
 		global $sem_options;
 		
 		$active_layout = apply_filters('active_layout', $sem_options['active_layout']);
@@ -107,7 +107,7 @@ class sem_template {
 	 * @return void
 	 **/
 
-	function scripts() {
+	static function scripts() {
 		global $wp_the_query;
 		if ( is_singular() && comments_open($wp_the_query->get_queried_object_id()) ) {
 			wp_enqueue_script('comment-reply');
@@ -122,7 +122,7 @@ class sem_template {
 	 * @return void
 	 **/
 
-	function styles() {
+	static function styles() {
 		global $sem_options;
 		$skin_path = sem_path . '/skins/' . $sem_options['active_skin'];
 		$skin_url = sem_url . '/skins/' . $sem_options['active_skin'];
@@ -187,7 +187,7 @@ class sem_template {
 	 * @return void
 	 **/
 	
-	function trackback_rdf() {
+	static function trackback_rdf() {
 		global $wp_the_query;
 		if ( is_singular() && comments_open($wp_the_query->get_queried_object_id()) ) {
 			echo '<!--' . "\n";
@@ -204,7 +204,7 @@ class sem_template {
 	 * @return void
 	 **/
 
-	function wp(&$wp) {
+	static function wp(&$wp) {
 		static $done = false;
 		
 		if ( $done )
@@ -235,7 +235,7 @@ class sem_template {
 	 * @return void
 	 **/
 	
-	function template_redirect() {
+	static function template_redirect() {
 		if ( !isset($_GET['action']) || $_GET['action'] != 'print' )
 			return;
 
@@ -260,7 +260,7 @@ class sem_template {
 	 * @return string $title
 	 **/
 
-	function widget_title($title) {
+	static function widget_title($title) {
 		return $title == '&nbsp;' ? '' : $title;
 	} # widget_title()
 	
@@ -271,7 +271,7 @@ class sem_template {
 	 * @return void
 	 **/
 
-	function display_credits() {
+	static function display_credits() {
 		global $sem_options;
 		
 		echo '<div id="credits">' . "\n"
@@ -450,7 +450,7 @@ class sem_template {
 	 * @return array $query_string
 	 **/
 
-	function archive_query_string($query_string) {
+	static function archive_query_string($query_string) {
 		parse_str($query_string, $qv);
 		unset($qv['paged'], $qv['debug']);
 		

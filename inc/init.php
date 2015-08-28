@@ -4,7 +4,13 @@
 #
 
 if ( !defined('sem_version') )
-	define('sem_version', '6.0');
+	define('sem_version', '6.2');
+
+if ( !defined('sem_theme') )
+	define('sem_theme', 'semiologic');
+
+if ( !defined('sem_semiologic_version') )
+	define('sem_semiologic_version', '6.2');
 
 if ( !defined('sem_debug') )
 	define('sem_debug', isset($_GET['debug']) );
@@ -20,7 +26,7 @@ if ( !defined('sem_header_cache_debug') )
 if ( !defined('sem_css_debug') )
 	define('sem_css_debug', false);
 
-define('sem_last_mod', sem_css_debug ? time() : '20140513');
+define('sem_last_mod', sem_css_debug ? time() : '20150828');
 
 if ( function_exists('memory_get_usage') && ( (int) @ini_get('memory_limit') < 64 ) )
 	@ini_set('memory_limit', '64M');

@@ -12,7 +12,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function register() {
+	static function register() {
 		global $sem_options;
 		
 		switch ( substr_count($sem_options['active_layout'], 's') ) {
@@ -109,7 +109,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function display($panel_id) {
+	static function display($panel_id) {
 		if ( $panel_id != 'the_entry' && !class_exists('widget_contexts') && is_letter() )
 			return;
 		
@@ -150,7 +150,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function init_widgets() {
+	static function init_widgets() {
 		if ( !intval(get_option('init_sem_panels')) )
 			return;
 		
@@ -425,7 +425,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function sidebar() {
+	static function sidebar() {
 		global $sem_options;
 		if ( strpos(apply_filters('active_layout', $sem_options['active_layout']), 's') !== false ) {
 			include sem_path . '/sidebar.php';
@@ -439,7 +439,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function sidebar2() {
+	static function sidebar2() {
 		global $sem_options;
 		if ( substr_count(apply_filters('active_layout', $sem_options['active_layout']), 's') == 2 ) {
 			include sem_path . '/sidebar2.php';
@@ -453,7 +453,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function ext_sidebar() {
+	static function ext_sidebar() {
 		global $sem_options;
 		if ( strpos(apply_filters('active_layout', $sem_options['active_layout']), 'e') !== false ) {
 			include sem_path . '/sidebar-ext.php';
@@ -467,7 +467,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function the_header() {
+	static function the_header() {
 		return sem_panels::display('the_header');
 	} # the_header()
 	
@@ -478,7 +478,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function the_header_boxes() {
+	static function the_header_boxes() {
 		return sem_panels::display('the_header_boxes');
 	} # the_header_boxes()
 	
@@ -489,7 +489,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function before_the_entries() {
+	static function before_the_entries() {
 		return sem_panels::display('before_the_entries');
 	} # before_the_entries()
 	
@@ -500,7 +500,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function the_entry() {
+	static function the_entry() {
 		return sem_panels::display('the_entry');
 	} # the_entry()
 	
@@ -511,7 +511,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function after_the_entries() {
+	static function after_the_entries() {
 		return sem_panels::display('after_the_entries');
 	} # after_the_entries()
 	
@@ -522,7 +522,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function the_footer_boxes() {
+	static function the_footer_boxes() {
 		return sem_panels::display('the_footer_boxes');
 	} # the_footer_boxes()
 	
@@ -533,7 +533,7 @@ class sem_panels {
 	 * @return void
 	 **/
 
-	function the_footer() {
+	static function the_footer() {
 		return sem_panels::display('the_footer');
 	} # the_footer()
 	
@@ -580,16 +580,6 @@ class sem_panels {
 		return $sidebars_widgets;
 	} # convert()
 
-	/**
-	 * reload_widgets()
-	 *
-	 * @return void
-	 **/
-
-	function reload_widgets() {
-     // WP 3.3 function to handle preserving theme switches
-     _wp_sidebars_changed();
- }  # reload_widgets()
 } # sem_panels
 
 
@@ -598,7 +588,6 @@ sem_panels::register();
 if ( !defined('DOING_CRON') )
 	add_action('init', array('sem_panels', 'init_widgets'), 2000);
 
-add_action( 'after_switch_theme', array('sem_panels', 'reload_widgets'), 2000);
 
 if ( !empty($_GET['preview']) && !empty($_GET['stylesheet']) )
 	sem_panels::switch_themes();

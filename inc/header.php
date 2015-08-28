@@ -12,7 +12,7 @@ class sem_header {
 	 * @return void
 	 **/
 
-	function scripts() {
+	static function scripts() {
 		$header = header::get();
 		
 		if ( !$header )
@@ -32,7 +32,7 @@ class sem_header {
 	 * @return void
 	 **/
 	
-	function save_options() {
+	static function save_options() {
 		if ( !$_POST || !current_user_can('switch_themes') )
 			return;
 		

@@ -12,7 +12,7 @@ class sem_layout {
 	 * @return void
 	 **/
 	
-	function admin_head() {
+	static function admin_head() {
 		echo <<<EOS
 
 <style type="text/css">
@@ -86,7 +86,7 @@ EOS;
 	 * @return void
 	 **/
 
-	function save_options() {
+	static function save_options() {
 		if ( !$_POST || !current_user_can('switch_themes') )
 			return;
 		
@@ -115,7 +115,7 @@ EOS;
 	 * @return void
 	 **/
 
-	function edit_options() {
+	static function edit_options() {
 		echo '<div class="wrap">' . "\n";
 		echo '<form method="post" action="" id="option_picker">' . "\n";
 		
@@ -318,7 +318,7 @@ EOS;
 	 * @return array $layout_options
 	 **/
 
-	function get_layouts() {
+	static function get_layouts() {
 		return array(
 			'mse' => __('Content, Sidebar, Ext Sidebar', 'sem-theme'),
 			'sme' => __('Sidebar, Content, Ext Sidebar', 'sem-theme'),
@@ -342,7 +342,7 @@ EOS;
 	 * @return array $layout_options
 	 **/
 
-	function get_widths() {
+	static function get_widths() {
 		return array(
 			'narrow' => __('Narrow', 'sem-theme'),
 			'wide' => __('Wide', 'sem-theme'),
